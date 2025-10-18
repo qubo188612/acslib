@@ -4,6 +4,7 @@
 #define DLL_EXPORTS extern "C" __declspec(dllexport)
 #define DLL_CLASSEXP __declspec(dllexport)
 #include "dataStructure.h"
+#include <vector>
 
 namespace acs
 {
@@ -290,5 +291,32 @@ namespace acs
 返回:  4		 //操作失败
 */
 	DLL_EXPORTS int ACS_AxisStop(int deviceId, int axisId);//轴停止
+
+	/*
+返回:  0         //正常
+返回:  1         //连接传感器的deviceId要大于等于0，且小于等于MAX_DEVICEID_NUM
+返回:  2         //ACS网络未连接
+返回:  3		 //轴axisId号超过轴总数
+返回:  4		 //操作失败
+*/
+	DLL_EXPORTS int ACS_AxisSetPEG(int deviceId, int axisId,std::vector<double> pos);//设置PEG信号
+
+	/*
+返回:  0         //正常
+返回:  1         //连接传感器的deviceId要大于等于0，且小于等于MAX_DEVICEID_NUM
+返回:  2         //ACS网络未连接
+返回:  3		 //轴axisId号超过轴总数
+返回:  4		 //操作失败
+*/
+	DLL_EXPORTS bool ACS_AxisGetPEGisReady(int deviceId, int axisId);//获取设置PEG信号是否完成
+
+	/*
+返回:  0         //正常
+返回:  1         //连接传感器的deviceId要大于等于0，且小于等于MAX_DEVICEID_NUM
+返回:  2         //ACS网络未连接
+返回:  3		 //轴axisId号超过轴总数
+返回:  4		 //操作失败
+*/
+	DLL_EXPORTS int ACS_AxisStopPEG(int deviceId, int axisId);//停止PEG信号
 }
 #endif

@@ -128,6 +128,10 @@ namespace  acs
 			}
 			commonInit();
 			printComId();
+		#if USE_VIRTUAL == 2
+			//注册元类型
+			qRegisterMetaType<QVector<double>>("QVector<double>");
+		#endif
 			b_sdk_init = true;
 		}
         return ;
@@ -2009,6 +2013,166 @@ namespace  acs
 	#endif
 		m_axisinfo[deviceId].moveing[axisId] = false;
 		return 0;
+	}
+
+
+	int ACS_AxisSetPEG(int deviceId, int axisId, std::vector<double> pos)//设置PEG信号
+	{
+		std::lock_guard<std::mutex> lock(mtx); // 进入函数时加锁，离开时自动解锁
+		clearErrorInfo(deviceId);
+		if (deviceId < 0 || deviceId >= MAX_DEVICEID_NUM)
+		{
+			pushErrorInfo(deviceId, "Device number exceeds threshold");
+			return 1;
+		}
+		if (link_ftp_state[deviceId] == false)
+		{
+			pushErrorInfo(deviceId, "The drive is not connected.");
+			return 2;
+		}
+		if (axisId >= m_axisCount[deviceId])
+		{
+			pushErrorInfo(deviceId, "AxisId number exceeds threshold");
+			return 3;
+		}
+		QVector<double> peg_pos(pos.begin(), pos.end());
+#if USE_VIRTUAL==0
+			std::string str_axisId = std::to_string(axisId);
+			std::string str_sendhead = "ASSIGNPEG/f ";
+			std::string str_send = str_sendhead + str_axisId;
+			std::string str_tail;
+			if (axisId == 0)
+			{
+				str_tail = ", 0b100 0b0000\r";
+			}
+			else if (axisId == 1)
+			{
+				str_tail = ", 0b101 0b0000\r";
+			}
+			else 
+			{
+				str_tail = ", 0b110 0b0000\r";
+			}
+			std::string str = str_send + str_tail;
+			char *sendCmd = (char*)str.c_str();
+			char buff[10000];
+			int received = 0;
+			int err = 0;
+			if (!acsc_Transaction(Handle[deviceId], sendCmd, strlen(sendCmd), buff, 10000, &received, NULL)) {
+				pushErrorInfo(deviceId, _executeError(Handle[deviceId], acsc_GetLastError()));
+				return 4;
+			}
+#elif USE_VIRTUAL==1
+
+#elif USE_VIRTUAL==2
+		bool result;
+		QVariantMap outinfo;
+		QVariantMap ininfo;
+		ininfo.insert("cmd", QString("AxisSetPEG"));
+		ininfo.insert("axisId", axisId);
+		ininfo.insert("peg", QVariant::fromValue(peg_pos));
+		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+		if (false == success) {
+			pushErrorInfo(deviceId, "onAxisSetPEG is err");
+			return 4;
+		}
+		result = outinfo.value("result").toBool();
+#endif
+		return 0;
+	}
+
+	int ACS_AxisStopPEG(int deviceId, int axisId)
+	{
+		std::lock_guard<std::mutex> lock(mtx); // 进入函数时加锁，离开时自动解锁
+		clearErrorInfo(deviceId);
+		if (deviceId < 0 || deviceId >= MAX_DEVICEID_NUM)
+		{
+			pushErrorInfo(deviceId, "Device number exceeds threshold");
+			return 1;
+		}
+		if (link_ftp_state[deviceId] == false)
+		{
+			pushErrorInfo(deviceId, "The drive is not connected.");
+			return 2;
+		}
+		if (axisId >= m_axisCount[deviceId])
+		{
+			pushErrorInfo(deviceId, "AxisId number exceeds threshold");
+			return 3;
+		}
+#if USE_VIRTUAL==0
+		char *sendCmd = "STOPPEG 0\r";
+		char buff[10000];
+		int received = 0;
+		int err = 0;
+		if (!acsc_Transaction(Handle[deviceId], sendCmd, strlen(sendCmd), buff, 10000, &received, NULL)) {
+			pushErrorInfo(deviceId, _executeError(Handle[deviceId], acsc_GetLastError()));
+			return 4;
+		}
+#elif USE_VIRTUAL==1
+		
+#elif USE_VIRTUAL==2
+		bool result;
+		QVariantMap outinfo;
+		QVariantMap ininfo;
+		ininfo.insert("cmd", QString("AxisStopPEG"));
+		ininfo.insert("axisId", axisId);
+		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+		if (false == success) {
+			pushErrorInfo(deviceId, "onAxisStopPEG is err");
+			return 4;
+		}
+		result = outinfo.value("result").toBool();
+#endif
+		return 0;
+	}
+
+	bool ACS_AxisGetPEGisReady(int deviceId, int axisId)
+	{
+		bool rc = false;
+		std::lock_guard<std::mutex> lock(mtx); // 进入函数时加锁，离开时自动解锁
+		clearErrorInfo(deviceId);
+		if (deviceId < 0 || deviceId >= MAX_DEVICEID_NUM)
+		{
+			pushErrorInfo(deviceId, "Device number exceeds threshold");
+			return 1;
+		}
+		if (link_ftp_state[deviceId] == false)
+		{
+			pushErrorInfo(deviceId, "The drive is not connected.");
+			return 2;
+		}
+		if (axisId >= m_axisCount[deviceId])
+		{
+			pushErrorInfo(deviceId, "AxisId number exceeds threshold");
+			return 3;
+		}
+#if USE_VIRTUAL==0
+
+#elif USE_VIRTUAL==1
+		
+#elif USE_VIRTUAL==2
+		bool result;
+		QVariantMap outinfo;
+		QVariantMap ininfo;
+		ininfo.insert("cmd", QString("AxisStopPEG"));
+		ininfo.insert("axisId", axisId);
+		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+		if (false == success) {
+			pushErrorInfo(deviceId, "onAxisStopPEG is err");
+			return 4;
+		}
+		result = outinfo.value("result").toBool();
+		if (result == true)
+		{
+			rc=true;
+		}
+		else
+		{
+			rc=false;
+		}
+#endif
+		return rc;
 	}
 }
 
