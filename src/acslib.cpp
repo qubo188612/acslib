@@ -5,6 +5,7 @@
 #include "pthread.h"
 #include <mutex>
 #include <QVariantMap>
+#include <QThread>
 
 namespace  acs
 {
@@ -101,6 +102,16 @@ namespace  acs
 		std::cout << "CommitId_Acs: " << strCommitId_appAcs << std::endl;
 	}
 
+	Qt::ConnectionType getconnectionType()
+	{
+		QThread* currentThread = QThread::currentThread();
+		QThread* targetThread = ((QObject*)m_qtobject)->thread();
+		Qt::ConnectionType connectionType = (currentThread != targetThread)
+			? Qt::BlockingQueuedConnection
+			: Qt::DirectConnection;
+		return connectionType;
+	}
+
 	void ACS_Init()
     {
 		std::lock_guard<std::mutex> lock(mtx); // 进入函数时加锁，离开时自动解锁
@@ -192,7 +203,7 @@ namespace  acs
 		ininfo.insert("cmd", QString("isBufferIdle"));
 		ininfo.insert("deviceId", deviceId);
 		ininfo.insert("buffer", buffer);
-		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo),Q_ARG(QVariantMap, ininfo));
+		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo),Q_ARG(QVariantMap, ininfo));
 		if (false == success) {
 			pushErrorInfo(deviceId, "onIsBufferIdle is err");
 			return false;
@@ -220,7 +231,7 @@ namespace  acs
 		ininfo.insert("cmd", QString("stopBuffer"));
 		ininfo.insert("deviceId", deviceId);
 		ininfo.insert("buffer", buffer);
-		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 		if (false == success) {
 			pushErrorInfo(deviceId, "onStopBuffer is err");
 			return false;
@@ -394,7 +405,7 @@ namespace  acs
 		ininfo.insert("cmd", QString("GetAcsSoftWareLimit"));
 		ininfo.insert("mode",QString("SLLIMIT"));
 		ininfo.insert("axisId", axisId);
-		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 		if (false == success) {
 			pushErrorInfo(deviceId, "onGetAcsSoftWareLimit is err");
 			return 4;
@@ -461,7 +472,7 @@ namespace  acs
 		ininfo.insert("cmd", QString("GetAcsSoftWareLimit"));
 		ininfo.insert("mode", QString("SRLIMIT"));
 		ininfo.insert("axisId", axisId);
-		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 		if (false == success) {
 			pushErrorInfo(deviceId, "onGetAcsSoftWareLimit is err");
 			return 4;
@@ -503,7 +514,7 @@ namespace  acs
 			ininfo.insert("cmd", QString("SetAcsEnable"));
 			ininfo.insert("enable", true);
 			ininfo.insert("axisId", axisId);
-			bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+			bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 			if (false == success) {
 				pushErrorInfo(deviceId, "onSetAcsEnable is err");
 				return 4;
@@ -525,7 +536,7 @@ namespace  acs
 			ininfo.insert("cmd", QString("SetAcsEnable"));
 			ininfo.insert("enable", false);
 			ininfo.insert("axisId", axisId);
-			bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+			bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 			if (false == success) {
 				pushErrorInfo(deviceId, "onSetAcsEnable is err");
 				return 4;
@@ -591,7 +602,7 @@ namespace  acs
 			QVariantMap outinfo;
 			QVariantMap ininfo;
 			ininfo.insert("cmd", "GetAxisCount");
-			bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+			bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 			if (false == success) {
 				pushErrorInfo(deviceId, "onGetAxisCount is err");
 				return 4;
@@ -831,7 +842,7 @@ namespace  acs
 			ininfo.insert("cmd", QString("SetAcsEnable"));
 			ininfo.insert("enable", true);
 			ininfo.insert("axisId", axisId);
-			bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+			bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 			if (false == success) {
 				pushErrorInfo(deviceId, "onSetAcsEnable is err");
 				return 4;
@@ -853,7 +864,7 @@ namespace  acs
 			ininfo.insert("cmd", QString("SetAcsEnable"));
 			ininfo.insert("enable", false);
 			ininfo.insert("axisId", axisId);
-			bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+			bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 			if (false == success) {
 				pushErrorInfo(deviceId, "onSetAcsEnable is err");
 				return 4;
@@ -898,7 +909,7 @@ namespace  acs
 		QVariantMap ininfo;
 		ininfo.insert("cmd", QString("GetAcsEnable"));
 		ininfo.insert("axisId", axisId);
-		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 		if (false == success) {
 			pushErrorInfo(deviceId, "onGetAcsEnable is err");
 			return 4;
@@ -942,7 +953,7 @@ namespace  acs
 		QVariantMap ininfo;
 		ininfo.insert("cmd", QString("GetAcsSpeed"));
 		ininfo.insert("axisId", axisId);
-		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 		if (false == success) {
 			pushErrorInfo(deviceId, "onGetAcsSpeed is err");
 			return 4;
@@ -986,7 +997,7 @@ namespace  acs
 		ininfo.insert("cmd", QString("SetAcsSpeed"));
 		ininfo.insert("axisId", axisId);
 		ininfo.insert("speed", speed);
-		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 		if (false == success) {
 			pushErrorInfo(deviceId, "onSetAcsSpeed is err");
 			return 4;
@@ -1029,7 +1040,7 @@ namespace  acs
 		QVariantMap ininfo;
 		ininfo.insert("cmd", QString("GetDecelerationSpeed"));
 		ininfo.insert("axisId", axisId);
-		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 		if (false == success) {
 			pushErrorInfo(deviceId, "onGetDecelerationSpeed is err");
 			return 4;
@@ -1073,7 +1084,7 @@ namespace  acs
 		ininfo.insert("cmd", QString("SetDecelerationSpeed"));
 		ininfo.insert("axisId", axisId);
 		ininfo.insert("deceleration", deceleration);
-		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 		if (false == success) {
 			pushErrorInfo(deviceId, "onGetDecelerationSpeed is err");
 			return 4;
@@ -1116,7 +1127,7 @@ namespace  acs
 		QVariantMap ininfo;
 		ininfo.insert("cmd", QString("GetAccelerationSpeed"));
 		ininfo.insert("axisId", axisId);
-		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 		if (false == success) {
 			pushErrorInfo(deviceId, "onGetAccelerationSpeed is err");
 			return 4;
@@ -1160,7 +1171,7 @@ namespace  acs
 		ininfo.insert("cmd", QString("SetAccelerationSpeed"));
 		ininfo.insert("axisId", axisId);
 		ininfo.insert("acceleration", acceleration);
-		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 		if (false == success) {
 			pushErrorInfo(deviceId, "onSetAccelerationSpeed is err");
 			return 4;
@@ -1203,7 +1214,7 @@ namespace  acs
 		QVariantMap ininfo;
 		ininfo.insert("cmd", QString("GetAcsPosition"));
 		ininfo.insert("axisId", axisId);
-		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 		if (false == success) {
 			pushErrorInfo(deviceId, "onGetAcsPosition is err");
 			return 4;
@@ -1247,7 +1258,7 @@ namespace  acs
 			ininfo.insert("cmd", QString("SetAxisSoftwareNegativeLimitEnabled"));
 			ininfo.insert("axisId", axisId);
 			ininfo.insert("enable", true);
-			bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+			bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 			if (false == success) {
 				pushErrorInfo(deviceId, "onSetAxisSoftwareNegativeLimitEnabled is err");
 				return 4;
@@ -1269,7 +1280,7 @@ namespace  acs
 			ininfo.insert("cmd", QString("SetAxisSoftwareNegativeLimitEnabled"));
 			ininfo.insert("axisId", axisId);
 			ininfo.insert("enable", false);
-			bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+			bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 			if (false == success) {
 				pushErrorInfo(deviceId, "onSetAxisSoftwareNegativeLimitEnabled is err");
 				return 4;
@@ -1338,7 +1349,7 @@ namespace  acs
 		ininfo.insert("mode", QString("SLLIMIT"));
 		ininfo.insert("axisId", axisId);
 		ininfo.insert("pos", pos);
-		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 		if (false == success) {
 			pushErrorInfo(deviceId, "onSetAcsSoftWareLimit is err");
 			return 4;
@@ -1383,7 +1394,7 @@ namespace  acs
 		ininfo.insert("cmd", QString("GetAcsSoftWareLimit"));
 		ininfo.insert("mode", QString("SLLIMIT"));
 		ininfo.insert("axisId", axisId);
-		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 		if (false == success) {
 			pushErrorInfo(deviceId, "onGetAcsSoftWareLimit is err");
 			return 4;
@@ -1427,7 +1438,7 @@ namespace  acs
 			ininfo.insert("cmd", QString("SetAxisSoftwarePositiveLimitEnabled"));
 			ininfo.insert("axisId", axisId);
 			ininfo.insert("enable", true);
-			bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+			bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 			if (false == success) {
 				pushErrorInfo(deviceId, "onSetAxisSoftwarePositiveLimitEnabled is err");
 				return 4;
@@ -1505,7 +1516,7 @@ namespace  acs
 		ininfo.insert("mode", QString("SRLIMIT"));
 		ininfo.insert("axisId", axisId);
 		ininfo.insert("pos", pos);
-		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 		if (false == success) {
 			pushErrorInfo(deviceId, "onSetAcsSoftWareLimit is err");
 			return 4;
@@ -1550,7 +1561,7 @@ namespace  acs
 		ininfo.insert("cmd", QString("GetAcsSoftWareLimit"));
 		ininfo.insert("mode", QString("SLLIMIT"));
 		ininfo.insert("axisId", axisId);
-		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 		if (false == success) {
 			pushErrorInfo(deviceId, "onGetAcsSoftWareLimit is err");
 			return 4;
@@ -1612,7 +1623,7 @@ namespace  acs
 		ininfo.insert("cmd", QString("MoveAbsPos"));
 		ininfo.insert("axisId", axisId);
 		ininfo.insert("pos", pos);
-		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 		if (false == success) {
 			pushErrorInfo(deviceId, "onMoveAbsPos is err");
 			return 6;
@@ -1658,7 +1669,7 @@ namespace  acs
 			QVariantMap ininfo;
 			ininfo.insert("cmd", QString("GetAcsPosition"));
 			ininfo.insert("axisId", axisId);
-			bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+			bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 			if (false == success) {
 				pushErrorInfo(deviceId, "onGetAcsPosition is err");
 				return 4;
@@ -1701,7 +1712,7 @@ namespace  acs
 			ininfo.insert("cmd", QString("MoveAbsPos"));
 			ininfo.insert("axisId", axisId);
 			ininfo.insert("pos", targetpos);
-			bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+			bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 			if (false == success) {
 				pushErrorInfo(deviceId, "onMoveAbsPos is err");
 				return 6;
@@ -1830,7 +1841,7 @@ namespace  acs
 		QVariantMap ininfo;
 		ininfo.insert("cmd", QString("GetAxisIsReady"));
 		ininfo.insert("axisId", axisId);
-		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 		if (false == success) {
 			pushErrorInfo(deviceId, "onGetAxisIsReady is err");
 			return false;
@@ -1948,7 +1959,7 @@ namespace  acs
 		QVariantMap ininfo;
 		ininfo.insert("cmd", QString("AxisHome"));
 		ininfo.insert("axisId", axisId);
-		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 		if (false == success) {
 			pushErrorInfo(deviceId, "onAxisHome is err");
 			return 4;
@@ -2004,7 +2015,7 @@ namespace  acs
 		QVariantMap ininfo;
 		ininfo.insert("cmd", QString("AxisStop"));
 		ininfo.insert("axisId", axisId);
-		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 		if (false == success) {
 			pushErrorInfo(deviceId, "onAxisStop is err");
 			return 4;
@@ -2071,7 +2082,7 @@ namespace  acs
 		ininfo.insert("cmd", QString("AxisSetPEG"));
 		ininfo.insert("axisId", axisId);
 		ininfo.insert("peg", QVariant::fromValue(peg_pos));
-		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 		if (false == success) {
 			pushErrorInfo(deviceId, "onAxisSetPEG is err");
 			return 4;
@@ -2117,7 +2128,7 @@ namespace  acs
 		QVariantMap ininfo;
 		ininfo.insert("cmd", QString("AxisStopPEG"));
 		ininfo.insert("axisId", axisId);
-		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 		if (false == success) {
 			pushErrorInfo(deviceId, "onAxisStopPEG is err");
 			return 4;
@@ -2157,7 +2168,7 @@ namespace  acs
 		QVariantMap ininfo;
 		ininfo.insert("cmd", QString("AxisStopPEG"));
 		ininfo.insert("axisId", axisId);
-		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
+		bool success = QMetaObject::invokeMethod((QObject*)m_qtobject, "onACScmd", getconnectionType(), Q_RETURN_ARG(QVariantMap, outinfo), Q_ARG(QVariantMap, ininfo));
 		if (false == success) {
 			pushErrorInfo(deviceId, "onAxisStopPEG is err");
 			return 4;
